@@ -19,7 +19,7 @@ jobs:
       IMAGE_NAME: ghcr.io/manhlane/define-payments-service
       IMAGE_TAG: latest
       CONTAINER_NAME: define-payments
-      APP_PORT: "3001"
+      APP_PORT: "3003"
       CONTAINER_PORT: "3000"
       ENV_FILE_PATH: "/home/ec2-user/define-payments.dev.env"
       DOCKER_NETWORK: "dfn-network"
