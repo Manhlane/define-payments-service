@@ -3,6 +3,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'express';
+import { IncomingMessage, ServerResponse } from 'http';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -22,7 +23,12 @@ async function bootstrap() {
 
   app.use(
     json({
-      verify: (req: Record<string, unknown>, _res, buf) => {
+      verify: (
+        req: IncomingMessage & { rawBody?: Buffer },
+        _res: ServerResponse,
+        buf: Buffer,
+        _encoding: string,
+      ) => {
         req.rawBody = buf;
       },
     }),
