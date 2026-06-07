@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentIntentRepository } from '../repositories/payment-intent.repository';
 import { PaymentScheduleRepository } from '../repositories/payment-schedule.repository';
 import { PayoutRepository } from '../repositories/payout.repository';
@@ -18,7 +23,8 @@ export class PayoutsService {
   ) {}
 
   async releaseFunds(paymentIntentId: string): Promise<Payout> {
-    const intent = await this.paymentIntentRepository.findByIdOrPublicId(paymentIntentId);
+    const intent =
+      await this.paymentIntentRepository.findByIdOrPublicId(paymentIntentId);
     if (!intent) {
       throw new NotFoundException('Payment intent not found.');
     }
@@ -27,14 +33,17 @@ export class PayoutsService {
       throw new BadRequestException('Payment intent is disputed.');
     }
 
-    const schedules = intent.schedules ??
+    const schedules =
+      intent.schedules ??
       (await this.paymentScheduleRepository.findByIntentId(intent.id));
 
     const unpaid = schedules.filter(
       (schedule) => schedule.status !== PaymentScheduleStatus.Paid,
     );
     if (unpaid.length > 0) {
-      throw new BadRequestException('All schedules must be paid before payout.');
+      throw new BadRequestException(
+        'All schedules must be paid before payout.',
+      );
     }
 
     const existing = intent.payouts?.find(
@@ -60,7 +69,9 @@ export class PayoutsService {
     intent.status = PaymentIntentStatus.Completed;
     await this.paymentIntentRepository.save(intent);
 
-    this.logger.log(`Payout ${payout.id} released for payment intent ${intent.id}`);
+    this.logger.log(
+      `Payout ${payout.id} released for payment intent ${intent.id}`,
+    );
 
     return payout;
   }

@@ -137,8 +137,14 @@ export class CreatePaymentsSchema20260327163000 implements MigrationInterface {
     await queryRunner.query(`DROP TYPE IF EXISTS "payout_status_enum";`);
     await queryRunner.query(`DROP TYPE IF EXISTS "transaction_status_enum";`);
     await queryRunner.query(`DROP TYPE IF EXISTS "transaction_type_enum";`);
-    await queryRunner.query(`DROP TYPE IF EXISTS "payment_schedule_status_enum";`);
-    await queryRunner.query(`DROP TYPE IF EXISTS "payment_schedule_type_enum";`);
-    await queryRunner.query(`DROP TYPE IF EXISTS "payment_intent_status_enum";`);
+    await queryRunner.query(
+      `DROP TYPE IF EXISTS "payment_schedule_status_enum";`,
+    );
+    await queryRunner.query(
+      `DROP TYPE IF EXISTS "payment_schedule_type_enum";`,
+    );
+    await queryRunner.query(
+      `DROP TYPE IF EXISTS "payment_intent_status_enum";`,
+    );
   }
 }

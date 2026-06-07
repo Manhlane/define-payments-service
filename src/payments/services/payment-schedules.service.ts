@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentScheduleRepository } from '../repositories/payment-schedule.repository';
 import { PaystackService } from './paystack.service';
 import { PaymentScheduleStatus } from '../enums/payment-schedule-status.enum';
@@ -11,7 +15,9 @@ export class PaymentSchedulesService {
     private readonly paystackService: PaystackService,
   ) {}
 
-  async initializePayment(scheduleId: string): Promise<InitializePaymentResponseDto> {
+  async initializePayment(
+    scheduleId: string,
+  ): Promise<InitializePaymentResponseDto> {
     const schedule = await this.paymentScheduleRepository.findById(scheduleId);
     if (!schedule) {
       throw new NotFoundException('Payment schedule not found.');
@@ -22,7 +28,10 @@ export class PaymentSchedulesService {
     }
 
     const intent = schedule.paymentIntent;
-    const result = await this.paystackService.initializePayment(schedule, intent);
+    const result = await this.paystackService.initializePayment(
+      schedule,
+      intent,
+    );
 
     schedule.paystackReference = result.reference;
     schedule.paystackAuthorizationUrl = result.authorizationUrl;

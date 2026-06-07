@@ -21,7 +21,13 @@ export class PaymentIntentRepository {
   async findById(id: string): Promise<PaymentIntent | null> {
     return this.repository.findOne({
       where: { id },
-      relations: ['schedules', 'transactions', 'payouts', 'deliverables', 'disputes'],
+      relations: [
+        'schedules',
+        'transactions',
+        'payouts',
+        'deliverables',
+        'disputes',
+      ],
       order: { schedules: { dueDate: 'ASC' } },
     });
   }
@@ -29,7 +35,13 @@ export class PaymentIntentRepository {
   async findByPublicId(publicId: string): Promise<PaymentIntent | null> {
     return this.repository.findOne({
       where: { publicId },
-      relations: ['schedules', 'transactions', 'payouts', 'deliverables', 'disputes'],
+      relations: [
+        'schedules',
+        'transactions',
+        'payouts',
+        'deliverables',
+        'disputes',
+      ],
       order: { schedules: { dueDate: 'ASC' } },
     });
   }

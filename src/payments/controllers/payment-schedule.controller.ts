@@ -6,7 +6,9 @@ import { PaymentSchedulesService } from '../services/payment-schedules.service';
 @ApiTags('payment-schedules')
 @Controller('payment-schedules')
 export class PaymentScheduleController {
-  constructor(private readonly paymentSchedulesService: PaymentSchedulesService) {}
+  constructor(
+    private readonly paymentSchedulesService: PaymentSchedulesService,
+  ) {}
 
   @ApiOkResponse({ type: InitializePaymentResponseDto })
   @Post(':id/pay')

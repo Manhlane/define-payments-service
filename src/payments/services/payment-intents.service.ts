@@ -9,7 +9,10 @@ import { randomUUID } from 'crypto';
 import { PaymentIntentRepository } from '../repositories/payment-intent.repository';
 import { PaymentScheduleRepository } from '../repositories/payment-schedule.repository';
 import { DeliverableRepository } from '../repositories/deliverable.repository';
-import { CreatePaymentIntentDto, DepositType } from '../dto/create-payment-intent.dto';
+import {
+  CreatePaymentIntentDto,
+  DepositType,
+} from '../dto/create-payment-intent.dto';
 import { UpdatePaymentIntentDto } from '../dto/update-payment-intent.dto';
 import { PaymentIntent } from '../entities/payment-intent.entity';
 import { PaymentSchedule } from '../entities/payment-schedule.entity';
@@ -38,7 +41,9 @@ export class PaymentIntentsService {
   ): Promise<PaymentIntentResponseDto> {
     const resolvedUserId = userId ?? payload.userId;
     if (!resolvedUserId) {
-      throw new UnauthorizedException('User is required to create a payment intent.');
+      throw new UnauthorizedException(
+        'User is required to create a payment intent.',
+      );
     }
 
     const totalAmount = this.normalizeAmount(payload.totalAmount);
@@ -57,12 +62,16 @@ export class PaymentIntentsService {
     if (requireDeposit) {
       if (depositType === DepositType.Percentage) {
         if (depositValue <= 0 || depositValue > 100) {
-          throw new BadRequestException('depositValue must be between 1 and 100.');
+          throw new BadRequestException(
+            'depositValue must be between 1 and 100.',
+          );
         }
         depositAmount = (totalAmount * depositValue) / 100;
       } else {
         if (depositValue <= 0) {
-          throw new BadRequestException('depositValue must be greater than zero.');
+          throw new BadRequestException(
+            'depositValue must be greater than zero.',
+          );
         }
         depositAmount = depositValue;
       }
@@ -88,7 +97,11 @@ export class PaymentIntentsService {
 
     const savedIntent = await this.paymentIntentRepository.save(intent);
 
-    const schedules = this.buildSchedules(savedIntent, depositAmount, remainderAmount);
+    const schedules = this.buildSchedules(
+      savedIntent,
+      depositAmount,
+      remainderAmount,
+    );
     await this.paymentScheduleRepository.saveMany(schedules);
 
     if (payload.deliverables && payload.deliverables.length > 0) {
@@ -133,9 +146,13 @@ export class PaymentIntentsService {
       intent.shootDate = this.parseDate(payload.shootDate, 'shootDate');
     }
     if (payload.deliveryDate) {
-      intent.deliveryDate = this.parseDate(payload.deliveryDate, 'deliveryDate');
+      intent.deliveryDate = this.parseDate(
+        payload.deliveryDate,
+        'deliveryDate',
+      );
     }
-    if (payload.currency) intent.currency = payload.currency.trim().toUpperCase();
+    if (payload.currency)
+      intent.currency = payload.currency.trim().toUpperCase();
 
     const saved = await this.paymentIntentRepository.save(intent);
     const refreshed = await this.getPaymentIntent(saved.id);
@@ -144,18 +161,24 @@ export class PaymentIntentsService {
 
   async getPaymentLinks(id: string): Promise<PaymentLinkResponseDto> {
     const intent = await this.getPaymentIntent(id);
-    const schedules = intent.schedules ??
+    const schedules =
+      intent.schedules ??
       (await this.paymentScheduleRepository.findByIntentId(intent.id));
 
     const depositSchedule = schedules.find(
       (schedule) => schedule.type === PaymentScheduleType.Deposit,
     );
     const remainderSchedule = schedules.find(
-      (schedule) => schedule.type === PaymentScheduleType.Remainder || schedule.type === PaymentScheduleType.Full,
+      (schedule) =>
+        schedule.type === PaymentScheduleType.Remainder ||
+        schedule.type === PaymentScheduleType.Full,
     );
 
     const depositLink = await this.ensurePaymentLink(intent, depositSchedule);
-    const remainderLink = await this.ensurePaymentLink(intent, remainderSchedule);
+    const remainderLink = await this.ensurePaymentLink(
+      intent,
+      remainderSchedule,
+    );
 
     return {
       depositAuthorizationUrl: depositLink?.authorizationUrl ?? null,
@@ -176,10 +199,13 @@ export class PaymentIntentsService {
       return;
     }
 
-    const schedules = intent.schedules ??
+    const schedules =
+      intent.schedules ??
       (await this.paymentScheduleRepository.findByIntentId(intent.id));
 
-    const relevantSchedules = schedules.filter((schedule) => schedule.amount > 0);
+    const relevantSchedules = schedules.filter(
+      (schedule) => schedule.amount > 0,
+    );
     const targetSchedules =
       relevantSchedules.length > 0 ? relevantSchedules : schedules;
     const paidCount = targetSchedules.filter(
@@ -226,7 +252,9 @@ export class PaymentIntentsService {
     };
   }
 
-  private toScheduleResponse(schedule: PaymentSchedule): PaymentScheduleResponseDto {
+  private toScheduleResponse(
+    schedule: PaymentSchedule,
+  ): PaymentScheduleResponseDto {
     return {
       id: schedule.id,
       type: schedule.type,
@@ -305,7 +333,10 @@ export class PaymentIntentsService {
       };
     }
 
-    const result = await this.paystackService.initializePayment(schedule, intent);
+    const result = await this.paystackService.initializePayment(
+      schedule,
+      intent,
+    );
     schedule.paystackReference = result.reference;
     schedule.paystackAuthorizationUrl = result.authorizationUrl;
     await this.paymentScheduleRepository.save(schedule);

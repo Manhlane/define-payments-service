@@ -8,10 +8,14 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
   ): Promise<DataSourceOptions> => {
     const dbUrl = configService.get<string>('DATABASE_URL');
 
+    console.log('[TypeORM] DATABASE_URL:', dbUrl);
+
     return {
       type: 'postgres',
       url: dbUrl,
-      ssl: dbUrl ? { rejectUnauthorized: false } : undefined,
+      ssl: {
+        rejectUnauthorized: false,
+      },
       synchronize: false,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],

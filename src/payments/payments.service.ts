@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { CreatePaymentRequestDto, DepositMode } from './dto/create-payment-request.dto';
+import {
+  CreatePaymentRequestDto,
+  DepositMode,
+} from './dto/create-payment-request.dto';
 import { NotificationsClient } from '../notifications/notifications.client';
 import { AuthUser } from '../auth/auth.client';
 
@@ -98,8 +101,14 @@ export class PaymentsService {
       clientPays,
       requireDeposit,
       depositMode: requireDeposit ? depositMode : undefined,
-      depositPercent: requireDeposit && depositMode === DepositMode.Percent ? depositPercent : undefined,
-      depositFixed: requireDeposit && depositMode === DepositMode.Fixed ? depositFixed : undefined,
+      depositPercent:
+        requireDeposit && depositMode === DepositMode.Percent
+          ? depositPercent
+          : undefined,
+      depositFixed:
+        requireDeposit && depositMode === DepositMode.Fixed
+          ? depositFixed
+          : undefined,
       depositAmount,
       depositFee,
       clientPaysNow,

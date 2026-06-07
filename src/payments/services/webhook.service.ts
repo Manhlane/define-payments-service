@@ -38,7 +38,8 @@ export class WebhookService {
       return;
     }
 
-    const schedule = await this.paymentScheduleRepository.findByReference(reference);
+    const schedule =
+      await this.paymentScheduleRepository.findByReference(reference);
     if (!schedule) {
       this.logger.warn(`No payment schedule found for reference ${reference}.`);
       return;
@@ -48,13 +49,18 @@ export class WebhookService {
       return;
     }
 
-    const existingTransaction = await this.transactionRepository.findByReference(reference);
+    const existingTransaction =
+      await this.transactionRepository.findByReference(reference);
     if (existingTransaction) {
       return;
     }
 
-    const amount = this.paystackService.fromPaystackAmount(payload?.data?.amount);
-    const currency = (payload?.data?.currency as string | undefined) ?? schedule.paymentIntent.currency;
+    const amount = this.paystackService.fromPaystackAmount(
+      payload?.data?.amount,
+    );
+    const currency =
+      (payload?.data?.currency as string | undefined) ??
+      schedule.paymentIntent.currency;
 
     const transaction = this.transactionRepository.create({
       paymentIntentId: schedule.paymentIntentId,
@@ -74,6 +80,8 @@ export class WebhookService {
     schedule.paidAt = new Date();
     await this.paymentScheduleRepository.save(schedule);
 
-    await this.paymentIntentsService.updatePaymentIntentStatus(schedule.paymentIntentId);
+    await this.paymentIntentsService.updatePaymentIntentStatus(
+      schedule.paymentIntentId,
+    );
   }
 }

@@ -7,7 +7,12 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthClient } from '../../auth/auth.client';
 import { CreatePaymentIntentDto } from '../dto/create-payment-intent.dto';
 import { UpdatePaymentIntentDto } from '../dto/update-payment-intent.dto';
@@ -35,7 +40,10 @@ export class PaymentIntentController {
       : undefined;
     const user = await this.authClient.getCurrentUser(token);
 
-    return this.paymentIntentsService.createPaymentIntent(payload, user?.id ?? null);
+    return this.paymentIntentsService.createPaymentIntent(
+      payload,
+      user?.id ?? null,
+    );
   }
 
   @ApiOkResponse({ type: PaymentIntentResponseDto })
@@ -57,7 +65,9 @@ export class PaymentIntentController {
 
   @ApiOkResponse({ type: PaymentLinkResponseDto })
   @Get(':id/payment-links')
-  async getPaymentLinks(@Param('id') id: string): Promise<PaymentLinkResponseDto> {
+  async getPaymentLinks(
+    @Param('id') id: string,
+  ): Promise<PaymentLinkResponseDto> {
     return this.paymentIntentsService.getPaymentLinks(id);
   }
 }

@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { join } from 'path';
 
-config();
+config(); // Loads .env
 
 const entitiesGlob = join(__dirname, '..', '**', '*.entity.{ts,js}');
 const migrationsGlob = join(__dirname, '..', 'migrations', '*{.ts,.js}');

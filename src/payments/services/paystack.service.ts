@@ -52,7 +52,9 @@ export class PaystackService {
 
     if (!response.ok) {
       const text = await response.text();
-      this.logger.error(`Paystack initialize failed: ${response.status} ${text}`);
+      this.logger.error(
+        `Paystack initialize failed: ${response.status} ${text}`,
+      );
       throw new Error('Failed to initialize Paystack payment.');
     }
 
@@ -114,10 +116,7 @@ export class PaystackService {
     return `ps_${randomUUID()}`;
   }
 
-  private async request(
-    path: string,
-    options: RequestInit,
-  ): Promise<Response> {
+  private async request(path: string, options: RequestInit): Promise<Response> {
     if (!this.secretKey) {
       throw new Error('PAYSTACK_SECRET_KEY is not configured.');
     }

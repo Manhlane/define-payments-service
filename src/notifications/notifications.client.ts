@@ -21,7 +21,9 @@ export class NotificationsClient {
     );
   }
 
-  async sendPaymentRequestEmail(payload: PaymentNotificationPayload): Promise<void> {
+  async sendPaymentRequestEmail(
+    payload: PaymentNotificationPayload,
+  ): Promise<void> {
     const subject = `Payment request for ${payload.serviceDescription}`;
     const body = `You have a new payment request for ${payload.currency} ${Math.round(
       payload.amount,

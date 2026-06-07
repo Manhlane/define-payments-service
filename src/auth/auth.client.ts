@@ -39,7 +39,10 @@ export class AuthClient {
         name: data.name,
       };
     } catch (error) {
-      this.logger.warn(`Failed to reach auth service at ${url}`, error as Error);
+      this.logger.warn(
+        `Failed to reach auth service at ${url}`,
+        error as Error,
+      );
       return null;
     }
   }
