@@ -27,7 +27,6 @@ async function bootstrap() {
         req: IncomingMessage & { rawBody?: Buffer },
         _res: ServerResponse,
         buf: Buffer,
-        _encoding: string,
       ) => {
         req.rawBody = buf;
       },
