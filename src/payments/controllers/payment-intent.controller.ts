@@ -40,10 +40,7 @@ export class PaymentIntentController {
       : undefined;
     const user = await this.authClient.getCurrentUser(token);
 
-    return this.paymentIntentsService.createPaymentIntent(
-      payload,
-      user?.id ?? null,
-    );
+    return this.paymentIntentsService.createPaymentIntent(payload, user);
   }
 
   @ApiOkResponse({ type: PaymentIntentResponseDto })

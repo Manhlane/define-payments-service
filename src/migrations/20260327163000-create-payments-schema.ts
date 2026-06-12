@@ -37,6 +37,7 @@ export class CreatePaymentsSchema20260327163000 implements MigrationInterface {
       CREATE TABLE IF NOT EXISTS "payment_intents" (
         "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         "publicId" VARCHAR NOT NULL UNIQUE,
+        "slug" VARCHAR NOT NULL UNIQUE,
         "userId" UUID NOT NULL,
         "clientName" VARCHAR NOT NULL,
         "clientEmail" VARCHAR NOT NULL,

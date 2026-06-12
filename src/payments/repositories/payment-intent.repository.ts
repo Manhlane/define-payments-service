@@ -46,9 +46,25 @@ export class PaymentIntentRepository {
     });
   }
 
+  async findBySlug(slug: string): Promise<PaymentIntent | null> {
+    return this.repository.findOne({
+      where: { slug },
+      relations: [
+        'schedules',
+        'transactions',
+        'payouts',
+        'deliverables',
+        'disputes',
+      ],
+      order: { schedules: { dueDate: 'ASC' } },
+    });
+  }
+
   async findByIdOrPublicId(identifier: string): Promise<PaymentIntent | null> {
     const byId = await this.findById(identifier);
     if (byId) return byId;
-    return this.findByPublicId(identifier);
+    const byPublicId = await this.findByPublicId(identifier);
+    if (byPublicId) return byPublicId;
+    return this.findBySlug(identifier);
   }
 }

@@ -22,6 +22,9 @@ export class PaymentIntent {
   @Column({ unique: true })
   publicId: string;
 
+  @Column({ unique: true })
+  slug: string;
+
   @Column({ type: 'uuid' })
   userId: string;
 

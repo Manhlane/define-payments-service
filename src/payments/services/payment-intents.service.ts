@@ -23,6 +23,7 @@ import { PaystackService } from './paystack.service';
 import { PaymentIntentResponseDto } from '../dto/payment-intent-response.dto';
 import { PaymentScheduleResponseDto } from '../dto/payment-schedule-response.dto';
 import { PaymentLinkResponseDto } from '../dto/payment-link-response.dto';
+import { AuthUser } from '../../auth/auth.client';
 
 @Injectable()
 export class PaymentIntentsService {
@@ -37,9 +38,9 @@ export class PaymentIntentsService {
 
   async createPaymentIntent(
     payload: CreatePaymentIntentDto,
-    userId?: string | null,
+    user?: AuthUser | null,
   ): Promise<PaymentIntentResponseDto> {
-    const resolvedUserId = userId ?? payload.userId;
+    const resolvedUserId = user?.id ?? payload.userId;
     if (!resolvedUserId) {
       throw new UnauthorizedException(
         'User is required to create a payment intent.',
@@ -82,6 +83,7 @@ export class PaymentIntentsService {
 
     const intent = this.paymentIntentRepository.create({
       publicId: this.generatePublicId(),
+      slug: this.generateSlug(),
       userId: resolvedUserId,
       clientName: payload.clientName.trim(),
       clientEmail: payload.clientEmail.trim(),
@@ -235,6 +237,7 @@ export class PaymentIntentsService {
     return {
       id: intent.id,
       publicId: intent.publicId,
+      slug: intent.slug,
       userId: intent.userId,
       clientName: intent.clientName,
       clientEmail: intent.clientEmail,
@@ -345,6 +348,11 @@ export class PaymentIntentsService {
 
   private generatePublicId(): string {
     return `pi_${randomUUID()}`;
+  }
+
+  private generateSlug(): string {
+    const numeric = parseInt(randomUUID().replace(/-/g, '').slice(0, 8), 16);
+    return numeric.toString(36).padStart(6, '0').slice(0, 6);
   }
 
   private normalizeAmount(value: number): number {

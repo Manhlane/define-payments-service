@@ -9,6 +9,9 @@ export class PaymentIntentResponseDto {
   @ApiProperty()
   publicId: string;
 
+  @ApiProperty({ example: 'mxrzt' })
+  slug: string;
+
   @ApiProperty()
   userId: string;
 
