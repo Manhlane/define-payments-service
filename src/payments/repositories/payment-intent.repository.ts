@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaymentIntent } from '../entities/payment-intent.entity';
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 @Injectable()
 export class PaymentIntentRepository {
   constructor(
@@ -61,8 +64,10 @@ export class PaymentIntentRepository {
   }
 
   async findByIdOrPublicId(identifier: string): Promise<PaymentIntent | null> {
-    const byId = await this.findById(identifier);
-    if (byId) return byId;
+    if (UUID_PATTERN.test(identifier)) {
+      const byId = await this.findById(identifier);
+      if (byId) return byId;
+    }
     const byPublicId = await this.findByPublicId(identifier);
     if (byPublicId) return byPublicId;
     return this.findBySlug(identifier);
