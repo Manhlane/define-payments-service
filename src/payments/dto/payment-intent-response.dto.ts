@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentIntentStatus } from '../enums/payment-intent-status.enum';
 import { PaymentScheduleResponseDto } from './payment-schedule-response.dto';
+import { DeliverableResponseDto } from './deliverable-response.dto';
+import { PaymentProviderResponseDto } from './payment-provider-response.dto';
 
 export class PaymentIntentResponseDto {
   @ApiProperty()
@@ -14,6 +16,9 @@ export class PaymentIntentResponseDto {
 
   @ApiProperty()
   userId: string;
+
+  @ApiProperty({ type: PaymentProviderResponseDto, nullable: true })
+  provider: PaymentProviderResponseDto | null;
 
   @ApiProperty()
   clientName: string;
@@ -47,6 +52,9 @@ export class PaymentIntentResponseDto {
 
   @ApiProperty({ type: [PaymentScheduleResponseDto] })
   schedules: PaymentScheduleResponseDto[];
+
+  @ApiProperty({ type: [DeliverableResponseDto] })
+  deliverables: DeliverableResponseDto[];
 
   @ApiProperty()
   createdAt: Date;

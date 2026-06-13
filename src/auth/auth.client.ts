@@ -7,6 +7,14 @@ export type AuthUser = {
   name?: string;
 };
 
+export type PublicAuthProfile = {
+  id?: string;
+  name?: string;
+  businessName?: string | null;
+  avatarUrl?: string | null;
+  isVerified?: boolean;
+};
+
 @Injectable()
 export class AuthClient {
   private readonly logger = new Logger(AuthClient.name);
@@ -37,6 +45,38 @@ export class AuthClient {
         id: data.id,
         email: data.email,
         name: data.name,
+      };
+    } catch (error) {
+      this.logger.warn(
+        `Failed to reach auth service at ${url}`,
+        error as Error,
+      );
+      return null;
+    }
+  }
+
+  async getPublicProfile(userId: string): Promise<PublicAuthProfile | null> {
+    if (!userId) return null;
+    const url = `${this.normalizeBaseUrl(
+      this.baseUrl,
+    )}/auth/users/${encodeURIComponent(userId)}/public-profile`;
+    const fetchImpl = this.getFetch();
+
+    try {
+      const response = await fetchImpl(url, { method: 'GET' });
+      if (!response.ok) {
+        return null;
+      }
+      const data = (await response.json().catch(
+        () => null,
+      )) as PublicAuthProfile | null;
+      if (!data || typeof data !== 'object') return null;
+      return {
+        id: data.id,
+        name: data.name,
+        businessName: data.businessName ?? null,
+        avatarUrl: data.avatarUrl ?? null,
+        isVerified: Boolean(data.isVerified),
       };
     } catch (error) {
       this.logger.warn(

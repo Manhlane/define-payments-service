@@ -23,7 +23,9 @@ import { PaystackService } from './paystack.service';
 import { PaymentIntentResponseDto } from '../dto/payment-intent-response.dto';
 import { PaymentScheduleResponseDto } from '../dto/payment-schedule-response.dto';
 import { PaymentLinkResponseDto } from '../dto/payment-link-response.dto';
-import { AuthUser } from '../../auth/auth.client';
+import { AuthClient, AuthUser } from '../../auth/auth.client';
+import { DeliverableResponseDto } from '../dto/deliverable-response.dto';
+import { PaymentProviderResponseDto } from '../dto/payment-provider-response.dto';
 
 @Injectable()
 export class PaymentIntentsService {
@@ -34,6 +36,7 @@ export class PaymentIntentsService {
     private readonly paymentScheduleRepository: PaymentScheduleRepository,
     private readonly deliverableRepository: DeliverableRepository,
     private readonly paystackService: PaystackService,
+    private readonly authClient: AuthClient,
   ) {}
 
   async createPaymentIntent(
@@ -229,16 +232,23 @@ export class PaymentIntentsService {
     }
   }
 
-  toPaymentIntentResponse(intent: PaymentIntent): PaymentIntentResponseDto {
+  async toPaymentIntentResponse(
+    intent: PaymentIntent,
+  ): Promise<PaymentIntentResponseDto> {
     const schedules = (intent.schedules ?? []).map((schedule) =>
       this.toScheduleResponse(schedule),
     );
+    const deliverables = (intent.deliverables ?? []).map((deliverable) =>
+      this.toDeliverableResponse(deliverable),
+    );
+    const provider = await this.toProviderResponse(intent.userId);
 
     return {
       id: intent.id,
       publicId: intent.publicId,
       slug: intent.slug,
       userId: intent.userId,
+      provider,
       clientName: intent.clientName,
       clientEmail: intent.clientEmail,
       clientPhone: intent.clientPhone,
@@ -250,8 +260,40 @@ export class PaymentIntentsService {
       status: intent.status,
       requireDeposit: intent.requireDeposit,
       schedules,
+      deliverables,
       createdAt: intent.createdAt,
       updatedAt: intent.updatedAt,
+    };
+  }
+
+  private async toProviderResponse(
+    userId: string,
+  ): Promise<PaymentProviderResponseDto | null> {
+    const profile = await this.authClient.getPublicProfile(userId);
+    if (!profile) return null;
+
+    const name =
+      profile.businessName?.trim() ||
+      profile.name?.trim() ||
+      'Service provider';
+
+    return {
+      id: profile.id ?? userId,
+      name,
+      businessName: profile.businessName ?? null,
+      avatarUrl: profile.avatarUrl ?? null,
+      isVerified: Boolean(profile.isVerified),
+    };
+  }
+
+  private toDeliverableResponse(
+    deliverable: PaymentIntent['deliverables'][number],
+  ): DeliverableResponseDto {
+    return {
+      id: deliverable.id,
+      title: deliverable.title,
+      type: deliverable.type,
+      quantity: deliverable.quantity,
     };
   }
 
